@@ -25,7 +25,7 @@ def parse_data(filename: str, messenger: str, output_dir = "."):
                 data = json.load(jsonfile)
                 
                 # Checking if chat is personal dialogue
-                assert data["type"] == "personal_chat", "Data must be from a personal chat"
+                # assert data["type"] == "personal_chat", "Data must be from a personal chat"
 
                 print("Processing chat history with " + data['name'] + "...")
 
@@ -77,5 +77,6 @@ def parse_data(filename: str, messenger: str, output_dir = "."):
 
         case _:
             raise ValueError(f"Unrecognized messenger: {messenger}")
+    print("Done. Assembled data.csv at " + output_dir)
 # ---------------------------------------------------------------------
 
