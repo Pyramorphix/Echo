@@ -60,6 +60,8 @@ def parse_data(filename: str, messenger: str, output_dir = "."):
 
                                 # Possible types: video_message, voice_message, sticker, video_file, audio_file, animation (GIF)
                                 msg["type"] = msg["media_type"]
+                                if msg["type"] == "animation":
+                                    msg["type"] = "GIF"
                                 pass
 
                             else:
