@@ -5,7 +5,7 @@ import json
 # Using the following format:
 # | № | Name | type | timestamp | unix_time | text |
 # ---------------------------------------------------------------------
-def parse_data(filename: str, messenger: str, output_dir = "."):
+def parse_data(filename: str, messenger: str, output_dir: str = ".") -> None:
 
     # Checking if all the parameters are correct
     assert type(filename) is str, "File name must be a string"
@@ -18,11 +18,10 @@ def parse_data(filename: str, messenger: str, output_dir = "."):
             with open(filename + ".json", 'r') as jsonfile,\
                  open(output_dir + "/data.csv", 'w') as csvfile:
 
-                # Initializing writer object
-                writer = csv.writer(csvfile)
+                writer: object = csv.writer(csvfile)
                 
                 # Converting json file to dictionary
-                data = json.load(jsonfile)
+                data: dict = json.load(jsonfile)
                 
                 # Checking if chat is personal dialogue
                 # assert data["type"] == "personal_chat", "Data must be from a personal chat"
@@ -30,8 +29,9 @@ def parse_data(filename: str, messenger: str, output_dir = "."):
                 print("Processing chat history with " + data['name'] + "...")
 
 
-                messages = data["messages"]
+                messages: dict = data["messages"]
                 id = 0
+
                 for msg in messages:
 
                     # Excluding system messages
@@ -42,7 +42,7 @@ def parse_data(filename: str, messenger: str, output_dir = "."):
 
                             # Constructing the whole message out of parts
                             # (Weird Telegram formatting)
-                            text = ""
+                            text: str = ""
                             for part in msg["text_entities"]:
                                 text += part["text"]
 
@@ -54,19 +54,21 @@ def parse_data(filename: str, messenger: str, output_dir = "."):
                         # Messages without text (voice, video etc.)
                         else:
                                 
-                            text = ""
+                            text: str = ""
 
                             if "media_type" in msg:
 
                                 # Possible types: video_message, voice_message, sticker, video_file, audio_file, animation (GIF)
                                 msg["type"] = msg["media_type"]
+
                                 if msg["type"] == "animation":
                                     msg["type"] = "GIF"
-                                pass
 
                             else:
+
                                 if "photo" in msg:
                                     msg["type"] = "image"
+
                                 else:
                                     # IDK what else can it be
                                     msg["type"] = "file"
@@ -79,6 +81,7 @@ def parse_data(filename: str, messenger: str, output_dir = "."):
 
         case _:
             raise ValueError(f"Unrecognized messenger: {messenger}")
+
     print("Done. Assembled data.csv at " + output_dir)
 # ---------------------------------------------------------------------
 
