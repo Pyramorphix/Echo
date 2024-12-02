@@ -1,10 +1,11 @@
 from parser import parse_data
 from extract import extract_data
 
+# TODO: extract these from argparse
+
 raw_filename = "test"
 messenger = "Telegram"
 output_dir = "."
-
 
 parse_data(raw_filename, messenger, output_dir) 
 data, fields = extract_data(output_dir + "/data.csv")
@@ -33,7 +34,15 @@ sorted_msg_counts = sorted(total_messages_per_user.items(), key = lambda x: x[1]
 
 print(msg_counts)
 
-print("\n\n\x1B[1mAnalysis results\x1B[0m\n")
+
+def bold(string: str) -> str:
+    return "\x1B[1m" + string + "\x1B[0m"
+
+def underline(string: str) -> str:
+    return "\x1B[4m" + string + "\x1B[0m"
+
+
+print(f"\n\n{bold("Analysis results")}\n")
 print("Messages count")
 print("---------------------------------------------")
 
@@ -41,7 +50,7 @@ print(f"Total messages: {total_messages}")
 
 for user_stat in sorted_msg_counts:
     # Total messages by user
-    print(f"\n\x1B[4m{user_stat[0]}\x1B[0m: {user_stat[1]} ({user_stat[1] / total_messages * 100:.1f} %)")
+    print(f"\n{underline(user_stat[0])}: {user_stat[1]} ({user_stat[1] / total_messages * 100:.1f} %)")
 
     # Percentage of each message type by user
     sorted_msg_types = sorted(msg_counts[user_stat[0]].items(), key = lambda x: x[1], reverse = True)
@@ -61,7 +70,16 @@ print()
 print("Activity hours")
 print("---------------------------------------------")
 
+from datetime import datetime
 
-print()
+activity_hours = {user: {hour: 0 for hour in range(24)} for user in fields["users"]}
+
+for msg in data:
+    dt = datetime.fromisoformat(msg["timestamp"])
+    activity_hours[msg["user"]][dt.hour] += 1
+
+for user in fields["users"]:
+    print("Total activity: TBD")
+    print(f"\n{underline(user)}: {activity_hours[user]}")
 
 print("---------------------------------------------")
