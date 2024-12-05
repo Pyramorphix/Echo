@@ -2,8 +2,8 @@ import csv
 import json
 
 # Parsing messages from *filename* and making data.csv in *output_dir*
-# Using the following format:
-# | № | Name | type | timestamp | unix_time | text |
+# using the following format:
+# | ID | Username | type | timestamp | unix_time | text |
 # ---------------------------------------------------------------------
 def parse_data(filename: str, messenger: str, output_dir: str = ".") -> None:
 
@@ -20,6 +20,8 @@ def parse_data(filename: str, messenger: str, output_dir: str = ".") -> None:
 
                 writer: object = csv.writer(csvfile)
                 
+                writer.writerow(["ID", "user", "type", "timestamp", "unix_time", "text"])
+
                 # Converting json file to dictionary
                 data: dict = json.load(jsonfile)
                 
@@ -27,7 +29,6 @@ def parse_data(filename: str, messenger: str, output_dir: str = ".") -> None:
                 # assert data["type"] == "personal_chat", "Data must be from a personal chat"
 
                 print("Processing chat history with " + data['name'] + "...")
-
 
                 messages: dict = data["messages"]
                 id = 0
@@ -43,6 +44,7 @@ def parse_data(filename: str, messenger: str, output_dir: str = ".") -> None:
                             # Constructing the whole message out of parts
                             # (Weird Telegram formatting)
                             text: str = ""
+
                             for part in msg["text_entities"]:
                                 text += part["text"]
 
