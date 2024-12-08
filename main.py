@@ -1,5 +1,6 @@
-from sys import thread_info
 import pandas as pd
+from data_processing import extract_conversations, process_data
+from debug_print import bold, underline, print_conversations
 from parser import parse_data
 
 # TODO: extract these from argparse
@@ -9,6 +10,7 @@ messenger: str = "Telegram"
 output_dir: str = "."
 
 parse_data(raw_filename, messenger, output_dir) 
+
 data = pd.read_csv(output_dir + "/data.csv")
 # print(data.columns, '\n\n', fields, '\n\n')
 
@@ -16,13 +18,6 @@ data = pd.read_csv(output_dir + "/data.csv")
 
 # Testing some stuff before making it clean
 # TODO: make these separate functions
-
-
-def bold(string: str) -> str:
-    return "\x1B[1m" + string + "\x1B[0m"
-
-def underline(string: str) -> str:
-    return "\x1B[4m" + string + "\x1B[0m"
 
 
 print(f"\n\n{bold("Analysis results")}\n")
@@ -94,76 +89,21 @@ print()
 print("Conversation separation")
 print("---------------------------------------------")
 
-data["time_gap"] = data["unix_time"].diff()
 
-print(data["time_gap"])
+# Now we need to split the whole dialogue into separate 
+# conversations to get more meaningful results
 
-
-
-# Method with mean and standart deviation:
-# ----------------------------------------
-# new_convo_threshold = data["time_gap"].mean() + data["time_gap"].std()
-#
-# data["is_new_convo"] = data["time_gap"] > new_convo_threshold
-#
-# print(new_convo_threshold)
-# ----------------------------------------
+extract_conversations(data)
 
 
-
-# Method with quantile (in theory it should be the worst,
-# but somehow it turns out to be the best):
-# -------------------------------------------------------
-new_convo_threshold = data["time_gap"].quantile(.96)
-
-data["is_new_convo"] = data["time_gap"] > new_convo_threshold
-
-print(new_convo_threshold)
-# -------------------------------------------------------
-
-
-
-# Method with adaptive threshold with rolling window:
-# ---------------------------------------------------
-# data["time_gap"] = data["time_gap"].apply(lambda x: x ** 2)
-#
-# data["rolling_avg_gap"] = data["time_gap"].rolling(5, min_periods=1).mean()
-#
-# data["is_new_convo"] = data["time_gap"] > 3 * data["rolling_avg_gap"]
-# ---------------------------------------------------
-
-
-
-# Mark conversations
-
-conversation_id = 0
-conversation_ids = []
-
-for is_new in data['is_new_convo']:
-
-    if is_new:
-        conversation_id += 1
-
-    conversation_ids.append(conversation_id)
-
-
-data['conversation_ID'] = conversation_ids
+process_data(data)
 
 
 # Printing for debug:
 
-grouped = data.groupby("conversation_ID")
+# print_conversations(data)
 
 
-for convo_ID, msg_group in grouped:
-
-    print(f"Conversation {convo_ID}")
-
-    for _, row in msg_group.iterrows():
-
-        print(f"{bold(row['user'])}: {row['text']}")
-
-    print("#######################\n")
 
 
 print("---------------------------------------------")
