@@ -8,9 +8,145 @@ from wordcloud import WordCloud
 
 import matplotlib.pyplot as plt
 
+from debug_print import bold, underline, print_message_counts, print_user_activity, print_conversations
+
 
 LANG = "russian"
 LAUGHTER_REPLACEMENT_TEXT = "смех"
+
+
+
+
+
+
+
+
+
+def process_data(data: pd.DataFrame) -> None:
+
+    print("Counting messages...")
+
+
+    total_messages: int = count_total_messages(data)
+
+    total_messages_per_user: pd.Series = count_total_messages_per_user(data)
+    
+    msg_type_percentages: pd.Series = count_msg_type_percentages(data)
+    
+    
+    print("Done.")
+
+    # print_message_counts(total_messages, total_messages_per_user, msg_type_percentages)
+ 
+
+
+
+    print("Calculating users activity...")
+
+
+    activity_hours: pd.DataFrame = calculate_activity_hours(data) 
+
+
+    print("Done.")
+
+    # print_user_activity(activity_hours)
+
+
+
+    # Now we need to split the whole dialogue into separate 
+    # conversations to obtain more meaningful results
+
+    print("Extracting conversations...")
+
+
+    extract_conversations(data)
+
+
+    print("Done.")
+
+    # print_conversations(data)
+
+
+
+    # Refining punctuation and stuff
+
+    print("Preprocessing messages...")
+
+
+    preprocess_messages_text(data)
+    
+
+    print("Done.")
+
+
+    # Here is the point where we can plug data into
+    # smth like RuBERT for sentimental analysis
+    # (But we don't do it cause it works bad)
+
+    
+    print("Lemmatizing words...")
+    
+
+    lemmatize_messages_text(data)
+    
+
+    print("Done.")
+
+
+
+
+    print("Assembling word clouds...")
+    
+
+    main_word_cloud: WordCloud; user_word_clouds: dict[str, WordCloud]
+
+    main_word_cloud, user_word_clouds = assemble_word_clouds(data)
+    
+
+    print("Done.")
+
+
+
+
+
+def count_total_messages(data: pd.DataFrame) -> int:
+
+    # Number of all messages
+
+    return len(data)
+
+
+
+def count_total_messages_per_user(data: pd.DataFrame) -> pd.Series:
+
+    # Number of all messages by each user
+    # sorted in descending order for easier processing
+    
+    return data.groupby("user").size().sort_values(ascending = False) # pyright: ignore
+
+
+
+def count_msg_type_percentages(data: pd.DataFrame) -> pd.Series:
+
+    # Percentage of each message type by user
+
+    return data.groupby(["user", "type"]).size().groupby(level = 0).apply(lambda x: 100 * x/x.sum()) # pyright: ignore
+
+
+
+
+
+
+def calculate_activity_hours(data: pd.DataFrame) -> pd.DataFrame:
+
+    data["hour"] = pd.to_datetime(data["timestamp"]).dt.hour
+
+    # Amount of messages per each hour for every user
+
+    return data.groupby(['user', 'hour']).size().unstack(fill_value=0) # pyright: ignore
+
+
+
 
 
 
@@ -81,39 +217,6 @@ def mark_conversation_IDs(data: pd.DataFrame) -> None:
 
 
     data['conversation_ID'] = conversation_ids
-
-
-
-
-
-
-
-
-
-def process_data(data: pd.DataFrame) -> None:
-
-    print("Preprocessing messages...")
-
-    preprocess_messages_text(data)
-    
-    print("Done.")
-
-    # Here is the point where we can plug data into
-    # smth like RuBERT for sentiment analysis
-    
-    print("Lemmatizing messages...")
-    
-    lemmatize_messages_text(data)
-    
-    print("Done.")
-
-
-
-    print("Assembling word clouds...")
-    
-    main_word_cloud, user_word_clouds = assemble_word_clouds(data)
-    
-    print("Done.")
 
 
 
@@ -252,7 +355,7 @@ def remove_stopwords(data: pd.DataFrame) -> None:
     # Removing stopwords like "я", "не", "очень" etc
     
     with open("stopwords.txt", 'r') as stopwords:
-        stopwords_list = stopwords.read().split()
+        stopwords_list: list = stopwords.read().split()
 
     data["text"] = data["text"].apply(lambda tokenized_msg: [word for word in tokenized_msg if word not in stopwords_list])
 
@@ -277,10 +380,10 @@ def assemble_word_clouds(data: pd.DataFrame) -> tuple[WordCloud, dict[str, WordC
     main_word_cloud = generate_word_colud(messages)
 
     # Temporary
-    plt.figure(figsize = (5, 5))
-    plt.axis("off")
-    plt.imshow(main_word_cloud)
-    plt.show()
+    # plt.figure(figsize = (5, 5))
+    # plt.axis("off")
+    # plt.imshow(main_word_cloud)
+    # plt.show()
 
 
     # Word clouds for each user
@@ -302,10 +405,11 @@ def assemble_word_clouds(data: pd.DataFrame) -> tuple[WordCloud, dict[str, WordC
             print(f"Cloud for {user} skipped: not enough messages")
 
 
-        plt.figure(figsize = (5, 5))
-        plt.axis("off")
-        plt.imshow(user_word_clouds[user])
-        plt.show()
+        # Temporary
+        # plt.figure(figsize = (5, 5))
+        # plt.axis("off")
+        # plt.imshow(user_word_clouds[user])
+        # plt.show()
 
     return main_word_cloud, user_word_clouds
 

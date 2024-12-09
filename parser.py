@@ -5,7 +5,7 @@ import json
 # using the following format:
 # | ID | Username | type | timestamp | unix_time | text |
 # ---------------------------------------------------------------------
-def parse_data(filename: str, messenger: str, output_dir: str = ".") -> None:
+def parse_data(filename: str, messenger: str, output_dir: str = "output/") -> None:
 
     # Checking if all the parameters are correct
     assert type(filename) is str, "File name must be a string"
