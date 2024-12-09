@@ -217,7 +217,7 @@ def reorder_activity_hours(activity_hours: pd.DataFrame, new_starting_index: int
     
     new_order = list(range(new_starting_index, 24)) + list(range(0, new_starting_index))
 
-    return activity_hours[new_order]
+    return activity_hours.reindex(index=new_order)
 
 
 
