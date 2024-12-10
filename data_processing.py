@@ -61,10 +61,11 @@ def process_data(data: pd.DataFrame, output_dir: str) -> tuple:
     activity_hours: pd.DataFrame = calculate_activity_hours(data) 
 
 
+
     # Shifting indexes from 0, 1, ..., 22, 23  to  6, 7, ..., 22, 23, 0, 1, ..., 4, 5
     # For more visually appealing histograms
     activity_hours = reorder_activity_hours(activity_hours, 6)
-    
+
 
     overall_activity_hours: pd.Series = activity_hours.sum(axis = 0)
 
@@ -215,10 +216,12 @@ def calculate_activity_hours(data: pd.DataFrame) -> pd.DataFrame:
 
 def reorder_activity_hours(activity_hours: pd.DataFrame, new_starting_index: int) -> pd.DataFrame:
     
-    new_order = list(range(new_starting_index, 24)) + list(range(0, new_starting_index))
+    cols = activity_hours.columns.tolist()
 
-    return activity_hours.reindex(index=new_order)
+    cols = cols[new_starting_index:] + cols[:new_starting_index]
 
+
+    return activity_hours[cols]
 
 
 def calculate_overall_activity(data: pd.DataFrame, output_dir: str) -> None:

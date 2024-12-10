@@ -27,11 +27,6 @@ def Resonance() -> None:
 
 
 
-    # Testing some stuff before making it clean
-    # TODO: make these separate functions
-
-
-
     final_data = process_data(data, output_dir)
 
 
