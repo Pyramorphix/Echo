@@ -15,8 +15,8 @@ def parse_data(filename: str, messenger: str, output_dir: str = "output/") -> No
     # Parsing data based on messenger (currently supported: Telegram)
     match messenger:
         case "Telegram":
-            with open(filename + ".json", 'r') as jsonfile,\
-                 open(output_dir + "/data.csv", 'w') as csvfile:
+            with open(filename + ".json", 'r', encoding="UTF8") as jsonfile,\
+                 open(output_dir + "/data.csv", 'w', encoding="UTF8") as csvfile:
 
                 writer: object = csv.writer(csvfile)
                 

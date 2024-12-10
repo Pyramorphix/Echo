@@ -221,7 +221,7 @@ def reorder_activity_hours(activity_hours: pd.DataFrame, new_starting_index: int
     cols = cols[new_starting_index:] + cols[:new_starting_index]
 
 
-    return activity_hours[cols]
+    return activity_hours[cols] # pyright: ignore
 
 
 def calculate_overall_activity(data: pd.DataFrame, output_dir: str) -> None:
@@ -246,7 +246,7 @@ def calculate_overall_activity(data: pd.DataFrame, output_dir: str) -> None:
     rolling_counts = daily_counts.rolling(window=14, center=True).mean()
 
 
-    make_activity_plot(daily_counts, rolling_counts, f"{output_dir}/activity_plots/main", color="deepskyblue", title="Chat activity over time", xlabel="date", ylabel="Number of messages", plot_raw=True)
+    make_activity_plot(daily_counts, rolling_counts, f"{output_dir}/activity_plots/main", color="deepskyblue", title="Chat activity over time", xlabel="date", ylabel="Number of messages", plot_raw=True) # pyright: ignore
 
     
     # Now doing the same for all users
@@ -256,7 +256,7 @@ def calculate_overall_activity(data: pd.DataFrame, output_dir: str) -> None:
     user_rolling_activity = user_activity.rolling(window=14, axis=1, center=True).mean()
 
 
-    make_activity_plots(user_activity, user_rolling_activity, f"{output_dir}/activity_plots/all_users", title="Separate users chat activity over time", xlabel="date", ylabel="Number of messages", plot_raw=False)
+    make_activity_plots(user_activity, user_rolling_activity, f"{output_dir}/activity_plots/all_users", title="Separate users chat activity over time", xlabel="date", ylabel="Number of messages", plot_raw=False) # pyright: ignore
 
     
     # And for each user separately
@@ -270,7 +270,7 @@ def calculate_overall_activity(data: pd.DataFrame, output_dir: str) -> None:
         user_rolling_activity = user_activity.rolling(window=14, center=True).mean()
 
 
-        make_activity_plot(user_activity, user_rolling_activity, f"{output_dir}/activity_plots/{user}", title=f"{user} chat activity over time", xlabel="date", ylabel="Number of messages", plot_raw=False)
+        make_activity_plot(user_activity, user_rolling_activity, f"{output_dir}/activity_plots/{user}", title=f"{user} chat activity over time", xlabel="date", ylabel="Number of messages", plot_raw=False) # pyright: ignore
 
 
 
@@ -356,7 +356,7 @@ def calculate_who_wrote_the_first(data: pd.DataFrame) -> pd.DataFrame:
 
     first_messages["month"] = first_messages["timestamp"].dt.to_period("M")
 
-    return first_messages.groupby(["month", "user"]).size().unstack(fill_value=0)
+    return first_messages.groupby(["month", "user"]).size().unstack(fill_value=0) # pyright: ignore
 
 
 
